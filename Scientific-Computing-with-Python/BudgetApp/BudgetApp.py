@@ -1,3 +1,4 @@
+import numpy as np
 class Category:
     nome = ''
     
@@ -27,7 +28,7 @@ class Category:
         else:
             return True 
         
-    def deposit(self,amount,description=''):
+    def deposit(self,amount,description='initial deposit'):
         self.ledger.append({
             "amount": amount,
             "description": description
@@ -60,47 +61,97 @@ class Category:
             return True
         else:
             return False
-
+    def adicionar(self,valor):
+        self.percent = self.percent + valor
+        
+        
+        
 # Método extralista 
 def create_spend_chart(list_of_categories = []):
+    rotulos = [f'{(10-i)*10:>3}|' for i in range(10)]
+    col1 = [' ' for i in range(11)]
+    col2 = [' ' for i in range(11)]
+    col3 = [' ' for i in range(11)]
+    col4 = [' ' for i in range(11)]
+    
     if list_of_categories == []:
-        print("Percentage spent by category")
+#         print("Percentage spent by category")
         for i in range(11):
             print(f"{abs((i-10))*10:>3}|\n",end='')
         print(" "*4+'---')
     else:
         total = 0
         for category in list_of_categories:
-            total+= abs(category.loss)
+            total += abs(category.loss)
+            # ok
         for category in list_of_categories:    
-            percent = abs(round(category.loss / total,2))*100
-            category.percent += percent
+            percento = round(abs(category.loss) / total,2)*100
+            percento = int(percento)
+            t = category.adicionar(percento)
+            print(category.percent+1)
+        for i in range(len(list_of_categories)):
+            if i == 0:
+                n_ball = round(list_of_categories[i].percent/10)
+                for j in range(n_ball+1):
+                    col1[-1-j] = col1[j].replace(' ','o') 
+            if i == 1:
+                n_ball = round(list_of_categories[i].percent/10)
+                
+                for j in range(n_ball+1):
+                    col2[-1-j] = col2[j].replace(' ','o') 
+            if i == 2:
+                n_ball = round(list_of_categories[i].percent/10)
+                
+                for j in range(n_ball+1):
+                    col3[-1-j] = col3[j].replace(' ','o') 
+            if i == 3:
+                n_ball = round(list_of_categories[i].percent/10)
+                for j in range(n_ball+1):
+                    col4[-1-j] = col4[j].replace(' ','o') 
+
+        # Bolas do Gráfico
+        table = f"""Percentage spent by category
+100| {col1[0]}  {col2[0]}  {col3[0]}  {col4[0]}         
+ 90| {col1[1]}  {col2[1]}  {col3[1]}  {col4[1]}         
+ 80| {col1[2]}  {col2[2]}  {col3[2]}  {col4[2]}         
+ 70| {col1[3]}  {col2[3]}  {col3[3]}  {col4[3]}
+ 60| {col1[4]}  {col2[4]}  {col3[4]}  {col4[4]}
+ 50| {col1[5]}  {col2[5]}  {col3[5]}  {col4[5]}
+ 40| {col1[6]}  {col2[6]}  {col3[6]}  {col4[6]}
+ 30| {col1[7]}  {col2[7]}  {col3[7]}  {col4[7]}
+ 20| {col1[8]}  {col2[8]}  {col3[8]}  {col4[8]}
+ 10| {col1[9]}  {col2[9]}  {col3[9]}  {col4[9]}
+  0| {col1[10]}  {col2[10]}  {col3[10]}  {col4[10]}   
+"""        
+        constant = 0
+        if 'o' in col2:
+            constant+=3
+        if 'o' in col3:
+            constant+=3
+        if 'o' in col4:
+            constant+=3
+        # Linha de baixo
+        linha = f"{3*' '}----{constant*'-'}"
+        print(table,linha)
+
+
+        k = 0
         for category in list_of_categories:
-            
-            tabela=f'''
-            {100:>3}|{} {} {}
-            {90:>3}| {} {} {}
-            {80:>3}| {} {} {} 
-            {70:>3}| {} {} {}
-            {60:>3}| {} {} {}
-            {50:>3}| {} {} {}
-            {40:>3}| {} {} {}
-            {30:>3}| {} {} {}
-            {20:>3}| {} {} {}
-            {10:>3}| {} {} {}
-            {0:>3}|  {} {} {}
-            '''
-
-food = Category('food')
-entertainment = Category('entertainment')
-business = Category('business')
-
-food.deposit(900, "deposit")
-entertainment.deposit(900, "deposit")
-business.deposit(900, "deposit")
-food.withdraw(105.55)
-entertainment.withdraw(33.40)
-business.withdraw(10.99)
-
-create_spend_chart([food, entertainment, business])
-print("Percentage spent by category\n100|          \n 90|          \n 80|          \n 70|    o     \n 60|    o     \n 50|    o     \n 40|    o     \n 30|    o     \n 20|    o  o  \n 10|    o  o  \n  0| o  o  o  \n    ----------\n     B  F  E  \n     u  o  n  \n     s  o  t  \n     i  d  e  \n     n     r  \n     e     t  \n     s     a  \n     s     i  \n           n  \n           m  \n           e  \n           n  \n           t  ")
+            if len(category.nome) > k:
+                k = len(category.nome)
+        
+        nomes_categorias = [[4*' ' for i in range(k)]]
+        
+        l = 0
+        while l < len(list_of_categories):
+            lista = [i for i in list_of_categories[l].nome.capitalize()]
+            if len(lista) < k:
+                for i in range(k - len(lista)):
+                    lista.append(' ')
+            nomes_categorias.append(lista)
+            nomes_categorias.append(['' for i in range(k)])
+            l = l+1
+        matrix = np.array(nomes_categorias)
+        for i in matrix.T:
+            print(' '.join(i))
+        
