@@ -1,25 +1,18 @@
-import numpy as np
 class Category:
-    nome = ''
-    
-    ledger = list()
-    
-    percent = 0
-    funds = 0
-    
-    loss = 0
     
     def __init__(self, nome_categoria):
         self.nome = nome_categoria
-    
+        self.ledger = list()
+        self.percent, self.funds, self.loss = 0,0,0
+        
     def __str__(self):
-        print(self.nome.center(30,'*'))
+        titulo = self.nome.center(30,'*')+'\n'
+        nota_fiscal = []
         for dic in self.ledger:
             linha = f"{dic['description'][:23]:<23}{dic['amount']:>7.2f}"
-            print(linha)    
-        total = f"total: {self.funds - self.loss:.2f}"
-        print(total)
-        return ''
+            nota_fiscal.append(linha+'\n')    
+        total = f"Total: {self.funds - self.loss:.2f}"
+        return titulo+''.join(nota_fiscal)+total
 
     # Métodos
     def check_funds(self,amount):
@@ -28,39 +21,42 @@ class Category:
         else:
             return True 
         
-    def deposit(self,amount,description='initial deposit'):
+    def deposit(self,amount,description= ""):
         self.ledger.append({
             "amount": amount,
             "description": description
         })
         self.funds += amount
-
+        return self.ledger
+    
     def withdraw(self, amount, description=''):
         if self.check_funds(amount) == True:
             self.ledger.append({
-                "amount": - int(amount),
+                "amount": - float(amount),
                 "description": description
             })
-            self.loss += - int(amount)
+            self.loss += float(amount)
             return True
         else:
             return False
     
     def get_balance(self):
-        return self.funds
+        total = self.funds - self.loss
+        return total
     
     def transfer(self, amount, category):
         if self.check_funds(amount) == True:
             self.ledger.append({
-                "amount": - int(amount),
-                "description": f"Transfer to {category}"
+                "amount": - float(amount),
+                "description": f"Transfer to {category.nome}"
             })
-            self.loss += - int(amount)
+            self.loss += float(amount)
 
-            category.deposit(amount,description =f"Transfer to {category}")
+            category.deposit(amount,f"Transfer from {self.nome}")
             return True
         else:
-            return False
+            return False    
+        
     def adicionar(self,valor):
         self.percent = self.percent + valor
         
@@ -86,9 +82,10 @@ def create_spend_chart(list_of_categories = []):
             # ok
         for category in list_of_categories:    
             percento = round(abs(category.loss) / total,2)*100
+            print(percento)
             percento = int(percento)
             t = category.adicionar(percento)
-            print(category.percent+1)
+
         for i in range(len(list_of_categories)):
             if i == 0:
                 n_ball = round(list_of_categories[i].percent/10)
@@ -131,10 +128,7 @@ def create_spend_chart(list_of_categories = []):
         if 'o' in col4:
             constant+=3
         # Linha de baixo
-        linha = f"{3*' '}----{constant*'-'}"
-        print(table,linha)
-
-
+        linha = f"{4*' '}----{constant*'-'}"
         k = 0
         for category in list_of_categories:
             if len(category.nome) > k:
@@ -151,7 +145,11 @@ def create_spend_chart(list_of_categories = []):
             nomes_categorias.append(lista)
             nomes_categorias.append(['' for i in range(k)])
             l = l+1
-        matrix = np.array(nomes_categorias)
-        for i in matrix.T:
-            print(' '.join(i))
+
+        nomes_do_final = ''
+        matrix = list(map(list,zip(*nomes_categorias)))
         
+        for i in matrix:
+            nomes_do_final += ' '.join(i)+'\n'
+
+        return table+linha+'\n'+nomes_do_final

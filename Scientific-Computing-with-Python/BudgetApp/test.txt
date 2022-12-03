@@ -1,0 +1,12 @@
+food.deposit(900, "deposit")
+food.withdraw(45.67, "milk, cereal, eggs, bacon, bread")
+transfer_amount = 20
+food_balance_before = food.get_balance()
+entertainment_balance_before = entertainment.get_balance()
+good_transfer = food.transfer(transfer_amount, entertainment)
+food_balance_after = food.get_balance()
+entertainment_balance_after = entertainment.get_balance()
+actual = food.ledger[2]
+expected = {"amount": -transfer_amount, "description": "Transfer to Entertainment"}
+actual = entertainment.ledger[0]
+expected = {"amount": transfer_amount, "description": "Transfer from Food"}
