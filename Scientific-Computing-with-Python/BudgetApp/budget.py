@@ -48,7 +48,7 @@ class Category:
         if self.check_funds(amount) == True:
             self.ledger.append({
                 "amount": - float(amount),
-                "description": f"Transfer to {category.name}"
+                "description": f"Transfer to {category_name}"
             })
             self.loss += float(amount)
 
